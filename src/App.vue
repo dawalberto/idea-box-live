@@ -21,7 +21,6 @@
 <script>
 import AppIdea from '@/components/AppIdea.vue'
 import AddIdea from '@/components/AddIdea.vue'
-import seed from '@/seed.json'
 import { firebase, auth, db } from '@/firebase.js'
 import { ref } from 'vue'
 
@@ -29,10 +28,22 @@ export default {
   name: 'App',
   components: { AppIdea, AddIdea },
   setup() {
-    const ideas = ref(seed.ideas)
+    const ideas = ref([])
     let user = ref(null)
 
     auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null))
+    db.collection('ideas').onSnapshot(
+      (snapshot) => {
+        const newIdeas = []
+        snapshot.docs.forEach((doc) => {
+          let { name, user, userName, votes } = doc.data()
+          let id = doc.id
+          newIdeas.push({ id, name, user, userName, votes })
+          ideas.value = newIdeas
+        })
+      },
+      (error) => console.log(error)
+    )
 
     const doLogin = async () => {
       const provider = new firebase.auth.GoogleAuthProvider()
