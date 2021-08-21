@@ -6,31 +6,12 @@
       <h1 class="mb-5 text-4xl text-center">IdeaBox</h1>
 
       <!-- Add idea -->
-      <section class="mb-6">
-        <form class="sm:flex">
-          <input
-            type="text"
-            class="w-full p-3 sm:flex-auto"
-            required
-            placeholder="Add your idea"
-          />
-          <input
-            v-if="user"
-            type="submit"
-            class="w-full p-2 sm:flex-1 bg-gray-600 text-white"
-            value="Add idea"
-          />
-        </form>
-        <p v-if="!user" class="user-actions">
-          Please
-          <a @click="doLogin" href="#">login</a>
-          first
-        </p>
-        <p v-else class="user-actions">
-          Hi 👋 {{ user.displayName }} <a @click="doLogout" href="#">Logout</a>.
-        </p>
-      </section>
-
+      <AddIdea
+        :user="user"
+        @do-login="doLogin"
+        @do-logout="doLogout"
+        @add-idea="addIdea"
+      />
       <!-- Idea item -->
       <AppIdea v-for="(idea, $index) of ideas" :key="$index" :idea="idea" />
     </div>
@@ -39,13 +20,14 @@
 
 <script>
 import AppIdea from "@/components/AppIdea.vue";
+import AddIdea from "@/components/AddIdea.vue";
 import seed from "@/seed.json";
-import { firebase, auth } from "@/firebase.js";
+import { firebase, auth, db } from "@/firebase.js";
 import { ref } from "vue";
 
 export default {
   name: "App",
-  components: { AppIdea },
+  components: { AppIdea, AddIdea },
   setup() {
     const ideas = ref(seed.ideas);
     let user = ref(null);
@@ -70,7 +52,20 @@ export default {
       }
     };
 
-    return { ideas, user, doLogin, doLogout };
+    const addIdea = async (data) => {
+      try {
+        await db.collection("ideas").add({
+          name: data.value,
+          user: user.value.uid,
+          userName: user.value.displayName,
+          votes: 0,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    return { ideas, user, doLogin, doLogout, addIdea };
   },
 };
 </script>
