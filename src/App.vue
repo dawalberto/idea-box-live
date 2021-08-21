@@ -19,55 +19,55 @@
 </template>
 
 <script>
-import AppIdea from "@/components/AppIdea.vue";
-import AddIdea from "@/components/AddIdea.vue";
-import seed from "@/seed.json";
-import { firebase, auth, db } from "@/firebase.js";
-import { ref } from "vue";
+import AppIdea from '@/components/AppIdea.vue'
+import AddIdea from '@/components/AddIdea.vue'
+import seed from '@/seed.json'
+import { firebase, auth, db } from '@/firebase.js'
+import { ref } from 'vue'
 
 export default {
-  name: "App",
+  name: 'App',
   components: { AppIdea, AddIdea },
   setup() {
-    const ideas = ref(seed.ideas);
-    let user = ref(null);
+    const ideas = ref(seed.ideas)
+    let user = ref(null)
 
-    auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null));
+    auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null))
 
     const doLogin = async () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
+      const provider = new firebase.auth.GoogleAuthProvider()
 
       try {
-        await auth.signInWithPopup(provider);
+        await auth.signInWithPopup(provider)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-    };
+    }
 
     const doLogout = async () => {
       try {
-        await auth.signOut();
+        await auth.signOut()
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-    };
+    }
 
     const addIdea = async (data) => {
       try {
-        await db.collection("ideas").add({
+        await db.collection('ideas').add({
           name: data.value,
           user: user.value.uid,
           userName: user.value.displayName,
           votes: 0,
-        });
+        })
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-    };
+    }
 
-    return { ideas, user, doLogin, doLogout, addIdea };
+    return { ideas, user, doLogin, doLogout, addIdea }
   },
-};
+}
 </script>
 
 <style>

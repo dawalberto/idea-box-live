@@ -40,12 +40,12 @@
 
 <script>
 export default {
-  name: "AppIdea",
+  name: 'AppIdea',
   props: {
     idea: {
       type: Object,
       required: true,
     },
   },
-};
+}
 </script>

@@ -27,28 +27,28 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref } from 'vue'
 export default {
-  name: "AddIdea",
-  emits: ["do-login", "do-logout", "add-idea"],
+  name: 'AddIdea',
+  emits: ['do-login', 'do-logout', 'add-idea'],
   props: {
     user: {
       type: [Object, null],
     },
   },
   setup(props, { emit }) {
-    const doLogin = () => emit("do-login");
-    const doLogout = () => emit("do-logout");
+    const doLogin = () => emit('do-login')
+    const doLogout = () => emit('do-logout')
 
-    const idea = ref("");
+    const idea = ref('')
     const addIdea = () => {
-      emit("add-idea", idea);
-      idea.value = "";
-    };
+      emit('add-idea', idea)
+      idea.value = ''
+    }
 
-    return { idea, doLogin, doLogout, addIdea };
+    return { idea, doLogin, doLogout, addIdea }
   },
-};
+}
 </script>
 
 <style></style>
