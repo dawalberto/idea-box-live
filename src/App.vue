@@ -17,6 +17,7 @@
         v-for="(idea, $index) of ideas"
         :key="$index"
         :idea="idea"
+        @vote-idea="voteIdea"
       />
     </div>
   </div>
@@ -35,21 +36,21 @@ export default {
     const ideas = ref([])
     let user = ref(null)
 
-    auth.onAuthStateChanged(
-      async (auth) => (user.value = auth ? auth : null),
-    )
-    db.collection('ideas').onSnapshot(
-      (snapshot) => {
-        const newIdeas = []
-        snapshot.docs.forEach((doc) => {
-          let { name, user, userName, votes } = doc.data()
-          let id = doc.id
-          newIdeas.push({ id, name, user, userName, votes })
-          ideas.value = newIdeas
-        })
-      },
-      (error) => console.log(error),
-    )
+    auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null))
+    db.collection('ideas')
+      .orderBy('votes', 'desc')
+      .onSnapshot(
+        (snapshot) => {
+          const newIdeas = []
+          snapshot.docs.forEach((doc) => {
+            let { name, user, userName, votes } = doc.data()
+            let id = doc.id
+            newIdeas.push({ id, name, user, userName, votes })
+            ideas.value = newIdeas
+          })
+        },
+        (error) => console.log(error),
+      )
 
     const doLogin = async () => {
       const provider = new firebase.auth.GoogleAuthProvider()
@@ -82,7 +83,19 @@ export default {
       }
     }
 
-    return { ideas, user, doLogin, doLogout, addIdea }
+    const voteIdea = async ({ id, type }) => {
+      try {
+        db.collection('ideas')
+          .doc(id)
+          .update({
+            votes: firebase.firestore.FieldValue.increment(type ? 1 : -1),
+          })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    return { ideas, user, doLogin, doLogout, addIdea, voteIdea }
   },
 }
 </script>
