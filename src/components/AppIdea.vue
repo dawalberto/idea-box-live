@@ -18,7 +18,7 @@
       "
     >
       <h3 class="text-3xl font-bold text-center">{{ idea.votes }}</h3>
-      <nav class="flex justify-center sm:block">
+      <nav v-if="user && !userVoted" class="flex justify-center sm:block">
         <img
           class="w-10 cursor-pointer"
           @click="voteIdea(true)"
@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+
 export default {
   name: 'AppIdea',
   emits: ['vote-idea'],
@@ -45,11 +47,20 @@ export default {
       type: Object,
       required: true,
     },
+    user: {
+      type: [Object, null],
+    },
   },
   setup(props, { emit }) {
     const voteIdea = (type) => emit('vote-idea', { id: props.idea.id, type })
 
-    return { voteIdea }
+    // eslint-disable-next-line vue/return-in-computed-property
+    const userVoted = computed(() => {
+      if (props.user.votes) {
+        return props.user.votes.find((item) => item === props.idea.id)
+      }
+    })
+    return { voteIdea, userVoted }
   },
 }
 </script>
