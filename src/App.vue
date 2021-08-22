@@ -13,7 +13,11 @@
         @add-idea="addIdea"
       />
       <!-- Idea item -->
-      <AppIdea v-for="(idea, $index) of ideas" :key="$index" :idea="idea" />
+      <AppIdea
+        v-for="(idea, $index) of ideas"
+        :key="$index"
+        :idea="idea"
+      />
     </div>
   </div>
 </template>
@@ -31,7 +35,9 @@ export default {
     const ideas = ref([])
     let user = ref(null)
 
-    auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null))
+    auth.onAuthStateChanged(
+      async (auth) => (user.value = auth ? auth : null),
+    )
     db.collection('ideas').onSnapshot(
       (snapshot) => {
         const newIdeas = []
@@ -42,7 +48,7 @@ export default {
           ideas.value = newIdeas
         })
       },
-      (error) => console.log(error)
+      (error) => console.log(error),
     )
 
     const doLogin = async () => {

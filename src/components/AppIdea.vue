@@ -1,8 +1,12 @@
 <template>
-  <article class="mb-3 p-3 sm:flex sm:items-center rounded-lg bg-gray-300">
+  <article
+    class="mb-3 p-3 sm:flex sm:items-center rounded-lg bg-gray-300"
+  >
     <!-- Info -->
     <section class="text-center sm:flex-1 sm:text-left">
-      <h2 class="text-xl sm:leading-6 sm:text-2xl">{{ idea.name }}</h2>
+      <h2 class="text-xl sm:leading-6 sm:text-2xl">
+        {{ idea.name }}
+      </h2>
       <small>{{ idea.userName }}</small>
     </section>
     <!-- Vote -->

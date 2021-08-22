@@ -21,7 +21,8 @@
       first
     </p>
     <p v-else class="user-actions">
-      Hi 👋 {{ user.displayName }} <a @click="doLogout" href="#">Logout</a>.
+      Hi 👋 {{ user.displayName }}
+      <a @click="doLogout" href="#">Logout</a>.
     </p>
   </section>
 </template>
