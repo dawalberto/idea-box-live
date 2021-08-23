@@ -1,6 +1,16 @@
 <template>
   <!-- Main container -->
   <div class="container mx-auto p-4">
+    <!-- Remove Idea Modal -->
+    <teleport to="body">
+      <RemoveIdea
+        v-if="isModalActive"
+        :name="ideaToRemove.name"
+        @remove-ok="removeIdea"
+        @remove-cancel="isModalActive = !isModalActive"
+      />
+    </teleport>
+
     <!-- Main box -->
     <div class="w-full bg-gray-100 shadow-lg p-4 rounded-lg">
       <h1 class="mb-5 text-4xl text-center">IdeaBox</h1>
@@ -12,6 +22,7 @@
         @do-logout="doLogout"
         @add-idea="addIdea"
       />
+
       <!-- Idea item -->
       <transition-group name="list-complete">
         <AppIdea
@@ -20,6 +31,7 @@
           :idea="idea"
           :user="user"
           @vote-idea="voteIdea"
+          @remove-idea="showRemoveIdeaModal"
           class="idea"
         />
       </transition-group>
@@ -31,13 +43,14 @@
 import AppIdea from '@/components/AppIdea.vue'
 import AddIdea from '@/components/AddIdea.vue'
 import { firebase, auth, db } from '@/firebase.js'
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
+const RemoveIdea = defineAsyncComponent(() => import('@/components/RemoveIdea.vue'))
 
 export default {
   name: 'App',
-  components: { AppIdea, AddIdea },
+  components: { AppIdea, AddIdea, RemoveIdea },
   setup() {
-    const ideas = ref([])
+    // User
     let user = ref(null)
 
     auth.onAuthStateChanged(async (auth) => {
@@ -62,21 +75,6 @@ export default {
       }
     })
 
-    db.collection('ideas')
-      .orderBy('votes', 'desc')
-      .onSnapshot(
-        (snapshot) => {
-          const newIdeas = []
-          snapshot.docs.forEach((doc) => {
-            let { name, user, userName, createdAt, votes } = doc.data()
-            let id = doc.id
-            newIdeas.push({ id, name, user, userName, createdAt, votes })
-            ideas.value = newIdeas
-          })
-        },
-        (error) => console.log(error),
-      )
-
     const doLogin = async () => {
       const provider = new firebase.auth.GoogleAuthProvider()
 
@@ -94,6 +92,26 @@ export default {
         console.log(error)
       }
     }
+
+    // Ideas
+    const ideas = ref([])
+    let isModalActive = ref(false)
+    let ideaToRemove = {}
+
+    db.collection('ideas')
+      .orderBy('votes', 'desc')
+      .onSnapshot(
+        (snapshot) => {
+          const newIdeas = []
+          snapshot.docs.forEach((doc) => {
+            let { name, user, userName, createdAt, votes } = doc.data()
+            let id = doc.id
+            newIdeas.push({ id, name, user, userName, createdAt, votes })
+            ideas.value = newIdeas
+          })
+        },
+        (error) => console.log(error),
+      )
 
     const addIdea = async (data) => {
       try {
@@ -138,7 +156,34 @@ export default {
       }
     }
 
-    return { ideas, user, doLogin, doLogout, addIdea, voteIdea }
+    const showRemoveIdeaModal = ({ id, name }) => {
+      ideaToRemove.id = id
+      ideaToRemove.name = name
+      isModalActive.value = true
+    }
+
+    const removeIdea = async () => {
+      try {
+        await db.collection('ideas').doc(ideaToRemove.id).delete()
+        ideaToRemove = {}
+        isModalActive.value = false
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    return {
+      ideas,
+      user,
+      doLogin,
+      doLogout,
+      addIdea,
+      voteIdea,
+      isModalActive,
+      ideaToRemove,
+      showRemoveIdeaModal,
+      removeIdea,
+    }
   },
 }
 </script>
