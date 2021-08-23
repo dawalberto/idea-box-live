@@ -1,24 +1,5 @@
 # idea-box-live
 
-## Project setup
-```
-npm install
-```
+Proyecto para poner en práctica la nueva **Composition API** de Vue 3
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Puedes ver el proyecto desplegado aquí 👉 [https://ideaboxlive-9ea52.web.app](https://ideaboxlive-9ea52.web.app)
